@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<table border="1" rules="all" width="600" align="center" id="tab">
+		
+	</table>
+	<script src="node_modules/jquery/dist/jquery.min.js"></script>
+	<script src="libs/arttemplate/template.js"></script>
+	<script id="demo" type="text/html">
+		<tr>
+			<th>id</th>
+			<th>name</th>
+			<th>author</th>
+			<th>price</th>
+			<th>press</th>
+			<th>操作</th>
+		</tr>
+		{{each bookList as value index}}
+		<tr>
+			<td>{{value.id}}</td>
+			<td>{{value.bookName}}</td>
+			<td>{{value.bookAuthor}}</td>
+			<td>{{value.bookPrice}}</td>
+			<td>{{value.bookPress}}</td>
+			<td>
+				<input type="button" value="删除" id="btn">
+			</td>
+		</tr>
+		{{/each}}
+	</script>
+	<script>
+		$.ajax({
+			url: "http://127.0.0.1:3000/books",
+			success: function(data) {
+				// console.log(data);
+				if(data.status == 200) {
+					var obj = {
+						bookList: data.results
+					}
+					tab.innerHTML = template("demo", obj);
+				}
+				
+			}
+		});
+
+		// 冒泡事件，事件委托。
+		$("#tab").on("click", "#btn", function(event) {
+			var id = $(event.target).parent().parent().find("td:first").text();
+			console.log(id)
+			// 1.向后台进行删除请求
+			$.ajax({
+				url: 'http://127.0.0.1:3000/books/' + id,
+				method: "DELETE",
+				success: function(data) {
+					console.log(data);
+				}
+			})
+
+			// alert("弹出");
+			$(event.target).parent().parent().remove();
+		});
+	</script>
+</body>
+</html>
